@@ -31,7 +31,7 @@ function App() {
   }
 
   const calculate = () => {
-    setDisplayValue(eval(displayValue))
+    setDisplayValue(eval(displayValue).toFixed(2))
   }
 
  
