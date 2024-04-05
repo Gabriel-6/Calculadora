@@ -4,13 +4,22 @@ import './index.css'
 function App() {
   const [displayValue, setDisplayValue] = useState('0');
   const [selectedOperator, setSelectOperator] = useState(false)
+  const [decimalAllowed, setDecimalAllowed] = useState(true)
 
   const setNumber = (number) => {
     if(selectedOperator) {
+      if(!decimalAllowed && number === '.'){
+        return
+      }
       setDisplayValue(displayValue === '0' || displayValue === 'Não Possivel Calcular' ? number: displayValue + number)
       setSelectOperator(false)
+      setDecimalAllowed(false)
     }else{
+      if(!decimalAllowed && number === '.'){
+        return
+      }
       setDisplayValue(displayValue === '0' || displayValue === 'Não Possivel Calcular' ? number: displayValue + number)
+      setDecimalAllowed(number !== '.')
     }
   }
 
@@ -22,10 +31,14 @@ function App() {
       setDisplayValue(displayValue + operation)
     }
     setSelectOperator(true)
+    setDecimalAllowed(true)
   }
 
   const setDot = (dot) => {
     if(!selectedOperator){
+      if(!decimalAllowed) {
+        return
+      }
       setDisplayValue(displayValue + dot)
       setSelectOperator(true)
     }
@@ -33,12 +46,20 @@ function App() {
 
   const clearDisplay = () => {
     setOperation(true)
+    setDecimalAllowed(false)
     setDisplayValue('0')
   }
 
+
   const deleteDigit = () => {
     if(typeof displayValue === 'string' && displayValue.length > 0) {
-      setDisplayValue(displayValue.slice(0, -1))
+      const finalDigit = displayValue[displayValue.length-1]
+      const newValue = displayValue.slice(0, -1)
+      if(finalDigit === '.') {
+        console.log(finalDigit)
+        setDecimalAllowed(true)
+      }
+      setDisplayValue(newValue)
     }
   }
 
