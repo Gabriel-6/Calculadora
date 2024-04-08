@@ -70,6 +70,7 @@ function App() {
 
   const calculate = () => {
     try{
+       // eslint-disable-next-line
       const result = eval(displayValue)
       if(result === Infinity || isNaN(result)){
         setDisplayValue("Não Possivel Calcular")
