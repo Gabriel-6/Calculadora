@@ -13,7 +13,7 @@ function App() {
       }
       setDisplayValue(displayValue === '0' || displayValue === 'Não Possivel Calcular' ? number: displayValue + number)
       setSelectOperator(false)
-      setDecimalAllowed(false)
+      setDecimalAllowed(number !== '.')
     }else{
       if(!decimalAllowed && number === '.'){
         return
@@ -36,6 +36,7 @@ function App() {
 
   const setDot = (dot) => {
     if(!selectedOperator){
+      console.log('setDot')
       if(!decimalAllowed) {
         return
       }
@@ -56,11 +57,11 @@ function App() {
       const finalDigit = displayValue[displayValue.length-1]
       const newValue = displayValue.slice(0, -1)
       if(finalDigit === '.') {
-        console.log(finalDigit)
         setDecimalAllowed(true)
+        console.log("Entrou")
       }
       setDisplayValue(newValue)
-    }
+    } 
   }
 
   const verifyNumber = (number) => {
@@ -70,7 +71,7 @@ function App() {
 
   const calculate = () => {
     try{
-       // eslint-disable-next-line
+      // eslint-disable-next-line
       const result = eval(displayValue)
       if(result === Infinity || isNaN(result)){
         setDisplayValue("Não Possivel Calcular")
@@ -90,6 +91,7 @@ function App() {
  
 
   return (
+    <div>
     <div className="bg-gray-500 w-80 mx-auto my-10 p-4 rounded-lg shadow-lg">
       <input className="w-full text-right pr-3 text-2xl bg-white text-black border-1 rounded-lg h-16 border-cyan-500" type='text' value={displayValue} disabled />
 
@@ -114,6 +116,7 @@ function App() {
         <button className="text-xl py-3 bg-gray-800 text-white rounded-lg" onClick={() => setDot(".")}>.</button>
         <button className="text-xl py-3 bg-gray-800 text-white rounded-lg" onClick={() => calculate()}>=</button>
       </div>
+    </div>
     </div>
   );
 }
