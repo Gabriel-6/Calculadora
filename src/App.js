@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import './index.css'
 
 function App() {
@@ -11,36 +11,39 @@ function App() {
       if(!decimalAllowed && number === '.'){
         return;
       }
-      setDisplayValue(displayValue === '0' || displayValue === 'Não Possivel Calcular' ? number: displayValue + number)
+      setDisplayValue((prevValue) => prevValue === '0' || prevValue === 'Não Possivel Calcular' ? number : prevValue + number)
       setSelectOperator(false)
-      setDecimalAllowed(number !== '.')
+      setDecimalAllowed(false)
     }else{
       if(!decimalAllowed && number === '.'){
         return
       }
-      setDisplayValue(displayValue === '0' || displayValue === 'Não Possivel Calcular' ? number: displayValue + number)
+      setDisplayValue((prevValue) => prevValue === '0' || prevValue === 'Não Possivel Calcular' ? number : prevValue + number)
       setDecimalAllowed(number !== '.')
     }
   }
 
   const setOperation = (operation) => {
-    const lastChar = displayValue[displayValue.length - 1]
-    if (lastChar === '+' || lastChar === '-' || lastChar === '*' || lastChar === '/') {
-      setDisplayValue(displayValue.slice(0, -1) + operation)
-    } else {
-      setDisplayValue(displayValue + operation)
+    if (displayValue === '' || displayValue === 'Não Possível Calcular') {
+      return
     }
-    setSelectOperator(true)
-    setDecimalAllowed(true)
+  
+    const lastChar = displayValue[displayValue.length - 1]
+    const isOperator = lastChar === '+' || lastChar === '-' || lastChar === '*' || lastChar === '/'
+    
+    if (!isOperator) {
+      setDisplayValue((prevValue) => prevValue + operation)
+      setSelectOperator(true)
+      setDecimalAllowed(true)
+    }
   }
 
   const setDot = (dot) => {
     if(!selectedOperator){
-      console.log('setDot')
       if(!decimalAllowed) {
         return
       }
-      setDisplayValue(displayValue + dot)
+      setDisplayValue((prevValue) => prevValue + dot)
       setSelectOperator(true)
     }
   }
@@ -57,17 +60,44 @@ function App() {
       const finalDigit = displayValue[displayValue.length-1]
       const newValue = displayValue.slice(0, -1)
       if(finalDigit === '.') {
+        console.log(finalDigit)
         setDecimalAllowed(true)
-        console.log("Entrou")
       }
       setDisplayValue(newValue)
-    } 
+    }
   }
 
   const verifyNumber = (number) => {
     return String(number).includes('.') ? true : false
   }
 
+  const handleEventListener = (event) => {
+    const key = event.key
+
+    if (!/^[\d\+\-\*\/\.]$/.test(key) && key !== 'Enter' && key !== 'Backspace') {
+      return
+    }
+
+    if(/\d/.test(key)){
+      setNumber(String(key))
+    }else if(['+', '-', '*', '/', '.'].includes(key)){
+      setOperation(String(key))
+    }else if(key === 'Enter'){
+      calculate()
+    }else if(key === 'Backspace'){
+      deleteDigit()
+    }else{
+      return
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleEventListener)
+
+    return () => {
+      window.removeEventListener('keydown', handleEventListener);
+    };
+  }, [displayValue])
 
   const calculate = () => {
     try{
@@ -88,11 +118,8 @@ function App() {
     } 
   }
 
- 
-
   return (
-    <div>
-    <div className="bg-gray-500 w-80 mx-auto my-10 p-4 rounded-lg shadow-lg">
+    <div className="bg-gray-500 w-80 mx-auto my-10 p-4 rounded-lg shadow-lg sm:w-full md:w-80">
       <input className="w-full text-right pr-3 text-2xl bg-white text-black border-1 rounded-lg h-16 border-cyan-500" type='text' value={displayValue} disabled />
 
       <div className="grid grid-cols-4 gap-4 mt-8">
@@ -117,8 +144,7 @@ function App() {
         <button className="text-xl py-3 bg-gray-800 text-white rounded-lg" onClick={() => calculate()}>=</button>
       </div>
     </div>
-    </div>
   );
 }
 
-export default App;
+export default App; 
